@@ -17,7 +17,7 @@ class JpaUserOutputPort(
 
     override fun save(user: User): Identity<Long> {
         return if (user.identity is NoIdentity) {
-            val entity = UserPersistenceEntity(
+            val entity = UserJpaEntity(
                     firstName = user.name.firstName,
                     lastName = user.name.lastName,
                     age = user.age.value
@@ -32,6 +32,6 @@ class JpaUserOutputPort(
     }
 
     override fun findBy(identity: Identity<Long>): User? {
-        return entityManager.find(UserPersistenceEntity::class.java, identity.id)?.toUser()
+        return entityManager.find(UserJpaEntity::class.java, identity.id)?.toUser()
     }
 }

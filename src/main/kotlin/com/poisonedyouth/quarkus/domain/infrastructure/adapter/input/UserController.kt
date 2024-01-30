@@ -16,7 +16,7 @@ class UserController(
 
     @GET
     fun getUser(@QueryParam("userId") userId: Long): Response {
-        val user = userUsecase.find(LongIdentity(userId))
+        val user = userUsecase.find(LongIdentity(userId))?.toUserDto()
         return if (user != null) {
             Response.ok(user).build()
         } else {

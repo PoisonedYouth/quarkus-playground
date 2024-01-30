@@ -12,4 +12,8 @@ data class Name(
             "Lastname must not be empty."
         }
     }
+
+    override fun toString(): String {
+        return "$firstName $lastName"
+    }
 }

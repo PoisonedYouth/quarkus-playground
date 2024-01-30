@@ -8,9 +8,11 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Table
 
 @Entity
-data class UserPersistenceEntity(
+@Table(name = "app_user")
+data class UserJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     val id: Long? = null,
@@ -19,7 +21,7 @@ data class UserPersistenceEntity(
     val age: Int
 )
 
-fun UserPersistenceEntity.toUser() = User(
+fun UserJpaEntity.toUser() = User(
     identity = LongIdentity(this.id ?: error("Missing id.")),
     name = Name(this.firstName, this.lastName),
     age = Age(this.age)
