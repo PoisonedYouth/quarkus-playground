@@ -2,6 +2,9 @@ package com.poisonedyouth.quarkus.domain.infrastructure.adapter.input
 
 import com.poisonedyouth.quarkus.domain.application.usecases.UserUsecase
 import com.poisonedyouth.quarkus.domain.vo.LongIdentity
+import io.micrometer.core.annotation.Counted
+import io.micrometer.core.annotation.Timed
+import io.micrometer.prometheus.PrometheusMeterRegistry
 import jakarta.ws.rs.GET
 import jakarta.ws.rs.POST
 import jakarta.ws.rs.Path
@@ -11,10 +14,12 @@ import org.jboss.resteasy.reactive.RestResponse.StatusCode.NOT_FOUND
 
 @Path("/user")
 class UserController(
-    private val userUsecase: UserUsecase
+        private val userUsecase: UserUsecase,
 ) {
 
     @GET
+    @Timed("user.get")
+    @Counted("user.get.count")
     fun getUser(@QueryParam("userId") userId: Long): Response {
         val user = userUsecase.find(LongIdentity(userId))?.toUserDto()
         return if (user != null) {
@@ -25,6 +30,8 @@ class UserController(
     }
 
     @POST
+    @Timed("user.add")
+    @Counted("user.add.count")
     fun addUser(user: UserDto): Response {
         val id = userUsecase.addNew(user.toUser())
         return Response.ok(id).build()

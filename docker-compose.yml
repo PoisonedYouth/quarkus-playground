@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   postgres:
-    container_name: "postgres_ktor_native"
+    container_name: "postgres_quarkus"
     image: postgres:16-alpine
     ports:
       - "5432:5432"
@@ -10,3 +10,24 @@ services:
       PGUSER: root
       POSTGRES_PASSWORD: password
       POSTGRES_DB: db
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./metrics/prometheus.yml:/etc/prometheus/prometheus.yml"
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - "grafana_storage:/var/lib/grafana"
+  quarkus-playground:
+    image: poisonedyouth/quarkus-playground:1.0-SNAPSHOT
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  grafana_storage:
