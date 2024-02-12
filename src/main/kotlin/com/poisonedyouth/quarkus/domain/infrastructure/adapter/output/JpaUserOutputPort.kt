@@ -8,25 +8,35 @@ import com.poisonedyouth.quarkus.domain.vo.toIdentity
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.EntityManager
 import jakarta.transaction.Transactional
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 @Transactional
 @ApplicationScoped
 class JpaUserOutputPort(
-        private val entityManager: EntityManager
+    private val entityManager: EntityManager
 ) : UserOutputPort {
+    private val logger: Logger = LoggerFactory.getLogger(JpaUserOutputPort::class.java)
 
     override fun save(user: User): Identity<Long> {
+        val entity = UserJpaEntity(
+            firstName = user.name.firstName,
+            lastName = user.name.lastName,
+            age = user.age.value
+        )
         return if (user.identity is NoIdentity) {
-            val entity = UserJpaEntity(
-                    firstName = user.name.firstName,
-                    lastName = user.name.lastName,
-                    age = user.age.value
-            )
+            logger.info("Persisting new user '$entity'.")
             entityManager.persist(
-                    entity
+                entity
             )
             entity.id.toIdentity()
         } else {
+            logger.info("Updating existing user '$entity'.")
+            entityManager.persist(
+                entity.copy(
+                    id = user.identity.id
+                )
+            )
             user.identity
         }
     }
