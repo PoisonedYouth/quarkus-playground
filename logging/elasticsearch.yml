@@ -1,0 +1,5 @@
+cluster.name: "elasticsearch"
+network.host: localhost
+discovery.type: single-node
+http.host: 0.0.0.0
+transport.host: 0.0.0.0

@@ -1,10 +1,10 @@
-version: "3.9"
+version: '3.9'
 services:
   postgres:
-    container_name: "postgres_quarkus"
-    image: postgres:16-alpine
+    container_name: postgres_quarkus
+    image: 'postgres:16-alpine'
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       POSTGRES_USER: root
       PGUSER: root
@@ -13,21 +13,56 @@ services:
   prometheus:
     image: prom/prometheus
     ports:
-      - "9090:9090"
+      - '9090:9090'
     volumes:
-      - "./metrics/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - './metrics/prometheus.yml:/etc/prometheus/prometheus.yml'
   grafana:
     image: grafana/grafana
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
-      - "grafana_storage:/var/lib/grafana"
+      - 'grafana_storage:/var/lib/grafana'
   quarkus-playground:
-    image: poisonedyouth/quarkus-playground:1.0-SNAPSHOT
+    image: 'poisonedyouth/quarkus-playground:1.0-SNAPSHOT'
     ports:
-      - "8080:8080"
+      - '8080:8080'
     depends_on:
-      - postgres
+      postgres:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
+
+  elasticsearch:
+    image: 'elasticsearch:8.12.2'
+    container_name: elasticsearch
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    volumes:
+      - 'elastic_data:/usr/share/elasticsearch/data/'
+      - ./logging/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./logging/sysctl.conf:/etc/sysctl.conf
+    environment:
+      ELASTIC_PASSWORD: "password1234"
+    healthcheck:
+      test: curl -s http://elasticsearch:9200 >/dev/null || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 50
+  kibana:
+    image: 'kibana:8.12.2'
+    container_name: kibana
+    ports:
+      - '5601:5601'
+    volumes:
+      - './logging/kibana.yml:/usr/share/kibana/config/kibana.yml'
+      - 'kibana_data:/usr/share/kibana/data'
+    environment:
+      ELASTICSEARCH_SERVICEACCOUNTTOKEN: "AAEAAWVsYXN0aWMva2liYW5hL3Rva2VuMTpkeEplSzVmRFN6NmUwWkRNdWFYUEh3"
+    depends_on:
+      - elasticsearch
 
 volumes:
   grafana_storage:
+  elastic_data:
+  kibana_data:

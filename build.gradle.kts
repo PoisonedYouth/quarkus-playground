@@ -24,6 +24,7 @@ dependencies {
     implementation("io.quarkus:quarkus-jdbc-postgresql")
     implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("net.codinux.log:quarkus-elasticsearch-logger:2.5.0")
     implementation("io.quarkus:quarkus-arc")
     runtimeOnly("org.postgresql:postgresql:42.7.1")
     testImplementation("io.quarkus:quarkus-junit5")
